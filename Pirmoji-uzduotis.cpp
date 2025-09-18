@@ -19,6 +19,19 @@ int main() {
 		return 2;
 	}
 	
+	out << in.rdbuf();
+
+	if (in.fail() && !in.eof()) {
+		std::cout << "Failo skaityme kilo klaida.\n";
+		return 3;
+	}
+
+	if (out.fail()) {
+		std::cout << "Rasymo metu kilo klaida.\n";
+		return 4;
+	}
+
+	std::cout << pr << " nukopijuotas i " << rz << std::endl;
 
 
 }
