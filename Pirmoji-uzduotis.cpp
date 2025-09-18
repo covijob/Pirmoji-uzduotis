@@ -1,4 +1,4 @@
-// v0.01 failu skaitymas
+﻿
 
 #include <iostream>
 #include <fstream>
@@ -7,6 +7,7 @@
 #include <string>
 #include <limits>
 #include <sstream>
+#include <algorithm>
 
 
 struct Studentas {
@@ -16,7 +17,6 @@ struct Studentas {
 	int egzaminas = 0;
 	double galutinis = 0.0;
 };
-//skaic vidurkis
 double vidurkis(const std::vector<int>& a) {
 	if (a.empty()) return 0.0;
 	long long s = 0;
@@ -24,13 +24,31 @@ double vidurkis(const std::vector<int>& a) {
 	return static_cast<double>(s) / a.size();
 }
 
-// galutinis
+double mediana(std::vector<int> a) {
+	if (a.empty()) return 0.0;
+	std::sort(a.begin(), a.end());
+	size_t n = a.size();
+	if (n % 2 == 0) return (a[n / 2 - 1] + a[n / 2]) / 2.0;
+	else return a[n / 2];
+}
+
 double galutinis_vidurkis(const Studentas& s) {
 	return 0.4 * vidurkis(s.nd) + 0.6 * s.egzaminas;
 }
 
+double galutinis_mediana(const Studentas& s) {
+	return 0.4 * mediana(s.nd) + 0.6 * s.egzaminas;
+}
 
 int main() {
+
+	int vartotojo_pasirinkimas = 1;
+	std::cout << "Pasirinkite skaiciavimo buda (1 - vidurkis, 2 - mediana): ";
+	if (!(std::cin >> vartotojo_pasirinkimas) || (vartotojo_pasirinkimas != 1 && vartotojo_pasirinkimas != 2)) {
+		std::cout << "Neteisingas pasirinkimas. Naudojamas vidurkis.\n";
+		vartotojo_pasirinkimas = 1;
+	}
+
 	const char* pr = "studentai_v1_test.txt";
 	const char* rz = "rezultatas.txt";
 
@@ -51,7 +69,7 @@ int main() {
 		std::istringstream iss(eilute);
 		Studentas s;
 		if (!(iss >> s.pavarde >> s.vardas)) {
-			std::cout << nr << " eiluteje nerasta pavarde/vardas � studentas praleidziamas.\n";
+			std::cout << nr << " eiluteje nerasta pavarde/vardas – studentas praleidziamas.\n";
 			continue;
 		}
 
@@ -69,7 +87,7 @@ int main() {
 
 		s.egzaminas = visi_skaiciai.back();
 		s.nd.assign(visi_skaiciai.begin(), visi_skaiciai.end() - 1);
-		s.galutinis = galutinis_vidurkis(s);
+		s.galutinis = (vartotojo_pasirinkimas == 1) ? galutinis_vidurkis(s) : galutinis_mediana(s);
 		grupe.push_back(std::move(s));
 	}
 	if (in.fail() && !in.eof()) {
@@ -88,10 +106,12 @@ int main() {
 
 	out << std::fixed << std::setprecision(2);
 	for (const auto& s : grupe) {
-		out << std::left << std::setw(15) << s.pavarde
-			<< std::left << std::setw(15) << s.vardas
-			<< std::right << std::setw(5) << std::fixed << std::setprecision(2) << s.galutinis
-			<< "\n";
+		// NAUJA: antraštės eilutė su pasirinkimu
+		out << std::left << std::setw(15) << "Pavarde"
+			<< std::left << std::setw(15) << "Vardas"
+			<< (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid.)" : "Galutinis (Med.)") << "\n"
+			<< std::string(15 + 15 + 18, '-') << "\n";
+
 	}
 
 	std::cout << "Rezultatai irasyti i faila: " << rz << std::endl;

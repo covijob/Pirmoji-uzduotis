@@ -1,8 +1,16 @@
-Sabonis        Arvydas         8.80
-Kurtinaitis    Rimas           7.40
-Jasikevicius   Sarunas         9.80
-Valanciunas    Jonas           6.60
-Kalnietis      Mantas          7.00
-Grigonis       Marius          8.80
-Ulanovas       Edgaras         5.60
-Maciulis       Jonas           8.60
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
+Pavarde        Vardas         Galutinis (Med.)
+------------------------------------------------
