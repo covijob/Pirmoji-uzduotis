@@ -1,6 +1,4 @@
-﻿
-
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <vector>
@@ -49,7 +47,7 @@ int main() {
 		vartotojo_pasirinkimas = 1;
 	}
 
-	const char* pr = "studentai_v1_test.txt";
+	const char* pr = "studentai1.txt";
 	const char* rz = "rezultatas.txt";
 
 	std::ifstream in(pr);
@@ -64,6 +62,7 @@ int main() {
 
 	while (std::getline(in, eilute)) {
 		++nr;
+		if (nr == 1) continue;
 		if (eilute.find_first_not_of(" \t\n\r") == std::string::npos) continue;
 
 		std::istringstream iss(eilute);
@@ -74,6 +73,8 @@ int main() {
 		}
 
 		//	grupe.push_back(s);
+
+
 
 		std::vector<int> visi_skaiciai;
 		int x;
@@ -87,7 +88,6 @@ int main() {
 
 		s.egzaminas = visi_skaiciai.back();
 		s.nd.assign(visi_skaiciai.begin(), visi_skaiciai.end() - 1);
-		s.galutinis = (vartotojo_pasirinkimas == 1) ? galutinis_vidurkis(s) : galutinis_mediana(s);
 		grupe.push_back(std::move(s));
 	}
 	if (in.fail() && !in.eof()) {
@@ -105,15 +105,27 @@ int main() {
 	}
 
 	out << std::fixed << std::setprecision(2);
-	for (const auto& s : grupe) {
-		// NAUJA: antraštės eilutė su pasirinkimu
-		out << std::left << std::setw(15) << "Pavarde"
-			<< std::left << std::setw(15) << "Vardas"
-			<< (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid.)" : "Galutinis (Med.)") << "\n"
-			<< std::string(15 + 15 + 18, '-') << "\n";
 
+	out << std::left << std::setw(15) << "Pavarde"
+		<< std::left << std::setw(15) << "Vardas"
+		<< (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid.)" : "Galutinis (Med.)") << "\n";
+
+	out << std::string(15 + 15 + 18, '-') << "\n";
+
+	for (const auto& s : grupe) {
+		double pasirinkimas = (vartotojo_pasirinkimas == 1)
+			? galutinis_vidurkis(s)
+			: galutinis_mediana(s);
+
+		out << std::left << std::setw(15) << s.pavarde
+			<< std::left << std::setw(15) << s.vardas
+			<< std::right << std::setw(8) << std::fixed << std::setprecision(2)
+			<< pasirinkimas << "\n";
 	}
 
+
+	
+	std::cout << (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid.)" : "Galutinis (Med.)") << "\n";
 	std::cout << "Rezultatai irasyti i faila: " << rz << std::endl;
 	return 0;
 
