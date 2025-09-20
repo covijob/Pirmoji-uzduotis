@@ -37,6 +37,21 @@ double galutinis_vidurkis(const Studentas& s) {
 double galutinis_mediana(const Studentas& s) {
 	return 0.4 * mediana(s.nd) + 0.6 * s.egzaminas;
 }
+//------------
+std::size_t u8len(const std::string& s) {
+	std::size_t n = 0;
+	for (unsigned char c : s) {
+		if ((c & 0xC0) != 0x80) ++n;  
+	}
+	return n;
+}
+
+void print_col(std::ostream& out, const std::string& text, std::size_t width) {
+	out << text;
+	std::size_t len = u8len(text);
+	if (len < width) out << std::string(width - len, ' ');
+}
+//-----------------
 
 int main() {
 
@@ -73,9 +88,6 @@ int main() {
 		}
 
 		//	grupe.push_back(s);
-
-
-
 		std::vector<int> visi_skaiciai;
 		int x;
 		while (iss >> x) visi_skaiciai.push_back(x);
@@ -105,26 +117,22 @@ int main() {
 	}
 
 	out << std::fixed << std::setprecision(2);
-
-	out << std::left << std::setw(15) << "Pavarde"
-		<< std::left << std::setw(15) << "Vardas"
-		<< (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid.)" : "Galutinis (Med.)") << "\n";
+	
+	print_col(out, "Vardas", 15);
+	print_col(out, "Pavarde", 15);
+	out << (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid." : "Galutinis (Med.)") << "\n";
 
 	out << std::string(15 + 15 + 18, '-') << "\n";
 
 	for (const auto& s : grupe) {
-		double pasirinkimas = (vartotojo_pasirinkimas == 1)
-			? galutinis_vidurkis(s)
-			: galutinis_mediana(s);
+		double pasirinkimas = (vartotojo_pasirinkimas == 1) ? galutinis_vidurkis(s) : galutinis_mediana(s);
 
-		out << std::left << std::setw(15) << s.pavarde
-			<< std::left << std::setw(15) << s.vardas
-			<< std::right << std::setw(8) << std::fixed << std::setprecision(2)
-			<< pasirinkimas << "\n";
+		print_col(out, s.pavarde, 15);
+		print_col(out, s.vardas, 15);
+		out << std::right << std::setw(8) << std::fixed << std::setprecision(2) << pasirinkimas << "\n";
+
 	}
 
-
-	
 	std::cout << (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid.)" : "Galutinis (Med.)") << "\n";
 	std::cout << "Rezultatai irasyti i faila: " << rz << std::endl;
 	return 0;
