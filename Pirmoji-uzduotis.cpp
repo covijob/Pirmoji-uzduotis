@@ -7,6 +7,8 @@
 #include <sstream>
 #include <algorithm>
 #include <random>
+#include <chrono>
+#include <thread>
 
 struct Studentas {
 	std::string vardas;
@@ -57,17 +59,10 @@ void print_col(std::ostream& out, const std::string& text, std::size_t width) {
 int main() {
 	const char* pr = "studentai1.txt";
 
-	int vartotojo_pasirinkimas = 1;
-	std::cout << "Pasirinkite skaiciavimo buda (1 - vidurkis, 2 - mediana): ";
-	if (!(std::cin >> vartotojo_pasirinkimas) || (vartotojo_pasirinkimas != 1 && vartotojo_pasirinkimas != 2)) {
-		std::cout << "Prasome pasirinkti 1 arba 2.\n";
-		std::cout << "Programa nutraukiama.\n";
-		std:exit(1);
-		
-	}
-
 	int pasirinktas_saltinis = 1;
-	std::cout << "Pasirinkite duomenu saltini (1 - txt failas, 2 - atsitiktinai generuoti domenys): ";
+	std::cout << "Pasirinkite duomenu saltini (1 - txt failas, 2 - atsitiktinai generuoti domenys): \n";
+	std::cout << "__________________________________________________________\n";
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 	if (!(std::cin >> pasirinktas_saltinis) || (pasirinktas_saltinis != 1 && pasirinktas_saltinis != 2)){
 		std::cout << "Prasome pasirinkti 1 arba 2.\n";
 		std::cout << "Programa nutraukiama.\n";
@@ -77,12 +72,13 @@ int main() {
 	if (pasirinktas_saltinis == 2) {
 		std::mt19937 rng(std::random_device{}());
 		std::uniform_int_distribution<int> distN(1, 100000);
-		std::uniform_int_distribution<int> distK(1, 25);
+		std::uniform_int_distribution<int> distK(5, 25);
 
 		int N = distN(rng); //studentu skaicius
 		int K = distK(rng); //pazymiu skaicius studentui
 
-		//std::cout << N << " " << K << "\n";
+		std::cout<< "Studentu skaicius: " << N << " " << "Bendras pazymiu kiekis: " << K << "\n";
+		std::cout << "__________________________________________________________\n";
 
 		int minP = 1;
 		int maxP = 10;
@@ -107,11 +103,29 @@ int main() {
 			for (int j = 1; j <= K; ++j) gen << " " << distPaz(rng);
 			gen << " " << distPaz(rng) << "\n";
 		}
+		/*
+		for (int i = 1; i <= N; ++i) {
+			std::cout << "Pavarde" << i << " Vardas" << i;
+			for (int j = 1; j <= K; ++j) std::cout << " " << distPaz(rng);
+			std::cout << " " << distPaz(rng) << "\n";
+		}
+		*/
 		gen.close();
 
 	}
 	// txt generavimo pabaiga
 
+	
+	int vartotojo_pasirinkimas = 1;
+	std::cout << "Pasirinkite skaiciavimo buda (1 - vidurkis, 2 - mediana): \n";
+	std::cout << "__________________________________________________________\n";
+
+	if (!(std::cin >> vartotojo_pasirinkimas) || (vartotojo_pasirinkimas != 1 && vartotojo_pasirinkimas != 2)) {
+		std::cout << "Prasome pasirinkti 1 arba 2.\n";
+		std::cout << "Programa nutraukiama.\n";
+	std:exit(1);
+
+	}
 
 	//const char* pr = "studentai1.txt";
 	const char* rz = "rezultatas.txt";
