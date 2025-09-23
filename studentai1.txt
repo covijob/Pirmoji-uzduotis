@@ -1,5 +1,5 @@
 Vardas Pavarde ND1 ND2 ND3 ND4 ND5 ND6 ND7 ND8 ND9 ND10 ND11 ND12 ND13 ND14 ND15 Egz.
-Saulius Kairys 2 10 10 9 8 8 3 7 2 4 3 5 10 1 5 7
+Saulius Kairys 2 10 9 8 8 3 7 2 4 3 5 1 5 7
 Arvydas Butkus 4 7 2 5 1 4 9 4 3 6 3 2 9 10 8 6
 Tomas Kairys 8 8 1 1 4 2 4 7 5 9 6 1 3 8 2 7
 Antanas Juodka 9 3 4 4 2 1 4 1 9 5 3 4 8 10 6 8
