@@ -202,15 +202,30 @@ int main() {
 	}
 
 	for (const auto& s : grupe) {
-		double pasirinkimas = (vartotojo_pasirinkimas == 1) ? galutinis_vidurkis(s) : galutinis_mediana(s);
+		const double gVid = galutinis_vidurkis(s);
+		const double gMed = galutinis_mediana(s);
 
 		print_col(out, s.pavarde, 15);
 		print_col(out, s.vardas, 15);
-		out << std::right << std::setw(8) << std::fixed << std::setprecision(2) << pasirinkimas << "\n";
 
+		if (vartotojo_pasirinkimas == 1) {
+			out << std::right << std::setw(8) << gVid << "\n";
+		}
+		else if (vartotojo_pasirinkimas == 2) {
+			out << std::right << std::setw(8) << gMed << "\n";
+		}
+		else { // 3 – abi reikšmės
+			out << std::right << std::setw(8) << gVid;
+			out << std::string(10, ' ');           // tarpas, kad tilptų į ~18 pločio stulpelį
+			out << std::right << std::setw(8) << gMed << "\n";
+		}
 	}
 
-	std::cout << (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid.)" : "Galutinis (Med.)") << "\n";
+
+	if (vartotojo_pasirinkimas == 1) std::cout << "Galutinis (Vid.)\n";
+	else if (vartotojo_pasirinkimas == 2) std::cout << "Galutinis (Med.)\n";
+	else std::cout << "Galutinis (Vid.) ir Galutinis (Med.)\n";
+
 	std::cout << "Rezultatai irasyti i faila: " << rz << std::endl;
 	return 0;
 
