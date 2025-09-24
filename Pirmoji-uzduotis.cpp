@@ -117,11 +117,11 @@ int main() {
 
 	
 	int vartotojo_pasirinkimas = 1;
-	std::cout << "Pasirinkite skaiciavimo buda (1 - vidurkis, 2 - mediana): \n";
+	std::cout << "Pasirinkite skaiciavimo buda (1 - vidurkis, 2 - mediana, 3 - vidurkis ir mediana): \n";
 	std::cout << "__________________________________________________________\n";
 
-	if (!(std::cin >> vartotojo_pasirinkimas) || (vartotojo_pasirinkimas != 1 && vartotojo_pasirinkimas != 2)) {
-		std::cout << "Prasome pasirinkti 1 arba 2.\n";
+	if (!(std::cin >> vartotojo_pasirinkimas) || (vartotojo_pasirinkimas < 1 || vartotojo_pasirinkimas > 3)) {
+		std::cout << "Prasome pasirinkti 1, 2 arba 3.\n";
 		std::cout << "Programa nutraukiama.\n";
 	std:exit(1);
 
@@ -185,9 +185,21 @@ int main() {
 	
 	print_col(out, "Vardas", 15);
 	print_col(out, "Pavarde", 15);
-	out << (vartotojo_pasirinkimas == 1 ? "Galutinis (Vid." : "Galutinis (Med.)") << "\n";
-
-	out << std::string(15 + 15 + 18, '-') << "\n";
+	
+	if (vartotojo_pasirinkimas == 1) {
+		out << "Galutinis (Vid.)\n";
+		out << std::string(15 + 15 + 18, '-') << "\n";
+	}
+	else if (vartotojo_pasirinkimas == 2) {
+		out << "Galurinis (Med.)\n";
+		out << std::string(15 + 15 + 18, '-') << "\n";
+	}
+	else {
+		print_col(out, "Galutinis (Vid.)", 18);
+		print_col(out, "Galutinis (Med.)", 18);
+		out << "\n";
+		out << std::string(15 + 15 + 18 + 18, '-') << "\n";
+	}
 
 	for (const auto& s : grupe) {
 		double pasirinkimas = (vartotojo_pasirinkimas == 1) ? galutinis_vidurkis(s) : galutinis_mediana(s);
