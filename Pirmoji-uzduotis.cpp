@@ -56,6 +56,47 @@ void print_col(std::ostream& out, const std::string& text, std::size_t width) {
 }
 //-----------------
 
+void ivedimas_is_konsoles(std::vector<Studentas>& grupe) {
+	using std::string;
+	using std::getline;
+
+	for (;;) {
+		std::cout << "Iveskite: PAVARDE ir VARDA (tuscia eilute - baigti): ";
+		string line;
+		getline(std::cin >> std::ws, line);
+		if (line.empty()) break;
+
+		std::istringstream pv(line);
+		Studentas s;
+		if (!(pv >> s.pavarde >> s.vardas)) {
+			std::cout << "Nerasta pavarde/vardas. Bandykite dar.\n";
+			continue;
+		}
+
+		std::cout << "Iveskite ND pazymius VIENOJE eiluteje (pvz.: 10 9 8). Tuscia eilute - pabaiga: ";
+		getline(std::cin, line);
+		if (!line.empty()) {
+			std::istringstream nds(line);
+			int x;
+			while (nds >> x) s.nd.push_back(x);
+		}
+
+		for (;;) {
+			std::cout << "Egzamino pazymys (1-10): ";
+			getline(std::cin, line);
+			std::istringstream es(line);
+			if (es >> s.egzaminas && s.egzaminas >= 1 && s.egzaminas <= 10) break;
+			std::cout << "Neteisinga ivestis. Bandykite dar.\n";
+		}
+
+		grupe.push_back(std::move(s));
+
+		std::cout << "Prideta. Enter - prideti kita, arba iveskite 'q' baigti: ";
+		getline(std::cin, line);
+		if (!line.empty() && (line == "q" || line == "Q")) break;
+	}
+}
+
 static const std::vector<std::string> VARD = {
 	"Jonas","Mantas","Lukas","Dominykas","Tomas","Nojus","Arnas","Kajus",
 	"Paulius","Dovydas","Andrius","Rokas","Benas","Adomas","Martynas",
@@ -89,7 +130,7 @@ void merge_sort(std::vector<T>& a, Less less) {
 			std::size_t r = std::min(i + 2 * width, n);
 			std::size_t p = l, q = m, k = l;
 			while (p < m && q < r) {
-				if (!less(a[q], a[p])) tmp[k++] = std::move(a[p++]); 
+				if (!less(a[q], a[p])) tmp[k++] = std::move(a[p++]);
 				else                    tmp[k++] = std::move(a[q++]);
 			}
 			while (p < m) tmp[k++] = std::move(a[p++]);
@@ -100,16 +141,14 @@ void merge_sort(std::vector<T>& a, Less less) {
 }
 //-----------------------
 
-
 int main() {
 	const char* pr = "studentai1.txt";
 
 	int pasirinktas_saltinis = 1;
-	std::cout << "Pasirinkite duomenu saltini (1 - txt failas, 2 - atsitiktinai generuoti domenys): \n";
+	std::cout << "Pasirinkite duomenu saltini (1 - txt failas, 2 - atsitiktinai generuoti duomenys, 3 - rankinis ivedimas): \n";
 	std::cout << "__________________________________________________________\n";
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-	if (!(std::cin >> pasirinktas_saltinis) || (pasirinktas_saltinis != 1 && pasirinktas_saltinis != 2)){
-		std::cout << "Prasome pasirinkti 1 arba 2.\n";
+	if (!(std::cin >> pasirinktas_saltinis) || (pasirinktas_saltinis < 1 || pasirinktas_saltinis > 3)) {
+		std::cout << "Prasome pasirinkti 1, 2 arba 3.\n";
 		std::cout << "Programa nutraukiama.\n";
 		std::exit(1);
 	}
@@ -121,16 +160,15 @@ int main() {
 		std::cin >> mstudentu_kiekis;
 	}
 
-	// txt generavimas 
 	if (pasirinktas_saltinis == 2) {
 		std::mt19937 rng(std::random_device{}());
 		std::uniform_int_distribution<int> distN(1, mstudentu_kiekis);
 		std::uniform_int_distribution<int> distK(5, 25);
 
-		int N = distN(rng); //studentu skaicius
-		int K = distK(rng); //pazymiu skaicius studentui
+		int N = distN(rng);
+		int K = distK(rng);
 
-		std::cout<< "Studentu skaicius: " << N << " " << "Bendras pazymiu kiekis: " << K << "\n";
+		std::cout << "Studentu skaicius: " << N << " " << "Bendras pazymiu kiekis: " << K << "\n";
 		std::cout << "__________________________________________________________\n";
 
 		int minP = 1;
@@ -139,15 +177,13 @@ int main() {
 		pr = "studentai_gen.txt";
 
 		std::ofstream gen(pr);
-		//-----
 		std::uniform_int_distribution<size_t> iv(0, VARD.size() - 1);
 		std::uniform_int_distribution<size_t> ip(0, PAV.size() - 1);
-		//-----
 
 		if (!gen) {
 			std::cout << "Nepavyko sukurti failo: " << pr << std::endl;
 			return 4;
-		} // note self:  gen tampa ofstream objektu, eina konversija i bool tipa
+		}
 
 		gen << "Pavarde Vardas ";
 		for (int j = 1; j <= K; ++j) gen << " ND" << j;
@@ -162,19 +198,9 @@ int main() {
 			for (int j = 1; j <= K; ++j) gen << " " << distPaz(rng);
 			gen << " " << distPaz(rng) << "\n";
 		}
-		/*
-		for (int i = 1; i <= N; ++i) {
-			std::cout << "Pavarde" << i << " Vardas" << i;
-			for (int j = 1; j <= K; ++j) std::cout << " " << distPaz(rng);
-			std::cout << " " << distPaz(rng) << "\n";
-		}
-		*/
 		gen.close();
-
 	}
-	// txt generavimo pabaiga
 
-	
 	int vartotojo_pasirinkimas = 1;
 	std::cout << "Pasirinkite skaiciavimo buda (1 - vidurkis, 2 - mediana, 3 - vidurkis ir mediana): \n";
 	std::cout << "__________________________________________________________\n";
@@ -182,8 +208,7 @@ int main() {
 	if (!(std::cin >> vartotojo_pasirinkimas) || (vartotojo_pasirinkimas < 1 || vartotojo_pasirinkimas > 3)) {
 		std::cout << "Prasome pasirinkti 1, 2 arba 3.\n";
 		std::cout << "Programa nutraukiama.\n";
-	std:exit(1);
-
+		std::exit(1);
 	}
 
 	int rikiavimo_pasirinkimas = 1;
@@ -193,59 +218,64 @@ int main() {
 	if (!(std::cin >> rikiavimo_pasirinkimas) || (rikiavimo_pasirinkimas != 1 && rikiavimo_pasirinkimas != 2)) {
 		std::cout << "Prasome pasirinkti 1 arba 2.\n";
 		std::cout << "Programa nutraukiama.\n";
-	std::exit(1);
-
+		std::exit(1);
 	}
-	//const char* pr = "studentai1.txt";
+
 	const char* rz = "rezultatas.txt";
 
-	std::ifstream in(pr);
-	if (!in) {    //in.fail() == true
-		std::cout << "Klaida atidarant faila: " << pr << std::endl;
-		return 1;
-	}
-
 	std::vector<Studentas> grupe;
-	std::string eilute;
-	size_t nr = 0;
 
-	while (std::getline(in, eilute)) {
-		++nr;
-		if (nr == 1) continue;
-		if (eilute.find_first_not_of(" \t\n\r") == std::string::npos) continue;
-
-		std::istringstream iss(eilute);
-		Studentas s;
-		if (!(iss >> s.pavarde >> s.vardas)) {
-			std::cout << nr << " eiluteje nerasta pavarde/vardas – studentas praleidziamas.\n";
-			continue;
+	if (pasirinktas_saltinis == 3) {
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		ivedimas_is_konsoles(grupe);
+	}
+	else {
+		std::ifstream in(pr);
+		if (!in) {
+			std::cout << "Klaida atidarant faila: " << pr << std::endl;
+			return 1;
 		}
 
-		//	grupe.push_back(s);
-		std::vector<int> visi_skaiciai;
-		int x;
-		while (iss >> x) visi_skaiciai.push_back(x);
+		std::string eilute;
+		size_t nr = 0;
 
-		if (visi_skaiciai.empty()) {
-			std::cout << nr << " eiluteje nerasta nei vieno pazymio - studentas praleidziamas.\n";
-			continue;
+		while (std::getline(in, eilute)) {
+			++nr;
+			if (nr == 1) continue;
+			if (eilute.find_first_not_of(" \t\n\r") == std::string::npos) continue;
 
+			std::istringstream iss(eilute);
+			Studentas s;
+			if (!(iss >> s.pavarde >> s.vardas)) {
+				std::cout << nr << " eiluteje nerasta pavarde/vardas – studentas praleidziamas.\n";
+				continue;
+			}
+
+			std::vector<int> visi_skaiciai;
+			int x;
+			while (iss >> x) visi_skaiciai.push_back(x);
+
+			if (visi_skaiciai.empty()) {
+				std::cout << nr << " eiluteje nerasta nei vieno pazymio - studentas praleidziamas.\n";
+				continue;
+			}
+
+			s.egzaminas = visi_skaiciai.back();
+			s.nd.assign(visi_skaiciai.begin(), visi_skaiciai.end() - 1);
+			grupe.push_back(std::move(s));
 		}
 
-		s.egzaminas = visi_skaiciai.back();
-		s.nd.assign(visi_skaiciai.begin(), visi_skaiciai.end() - 1);
-		grupe.push_back(std::move(s));
+		if (in.fail() && !in.eof()) {
+			std::cout << "Failo skaityme kilo klaida.\n";
+			return 3;
+		}
 	}
 
-
-	if (in.fail() && !in.eof()) {
-		std::cout << "Failo skaityme kilo klaida.\n";
-		return 3;
-	}
 	if (grupe.empty()) {
-		std::cout << "Nera nei vieno studento. Duomenu faile nerasta.\n";
+		std::cout << "Nera nei vieno studento.\n";
 		return 0;
 	}
+
 	std::ofstream out(rz);
 	if (!out) {
 		std::cout << "Nepavyko sukurti failo: " << rz << std::endl;
@@ -255,19 +285,17 @@ int main() {
 	if (rikiavimo_pasirinkimas == 1) merge_sort(grupe, less_vardas_pavarde);
 	else merge_sort(grupe, less_pavarde_vardas);
 
-
-
 	out << std::fixed << std::setprecision(2);
-	
-	print_col(out, "Vardas", 15);
+
 	print_col(out, "Pavarde", 15);
-	
+	print_col(out, "Vardas", 15);
+
 	if (vartotojo_pasirinkimas == 1) {
 		out << "Galutinis (Vid.)\n";
 		out << std::string(15 + 15 + 18, '-') << "\n";
 	}
 	else if (vartotojo_pasirinkimas == 2) {
-		out << "Galurinis (Med.)\n";
+		out << "Galutinis (Med.)\n";
 		out << std::string(15 + 15 + 18, '-') << "\n";
 	}
 	else {
@@ -284,21 +312,18 @@ int main() {
 		print_col(out, s.pavarde, 15);
 		print_col(out, s.vardas, 15);
 
-
-
 		if (vartotojo_pasirinkimas == 1) {
 			out << std::right << std::setw(8) << gVid << "\n";
 		}
 		else if (vartotojo_pasirinkimas == 2) {
 			out << std::right << std::setw(8) << gMed << "\n";
 		}
-		else { // 3 – abi reikšmės
+		else {
 			out << std::right << std::setw(8) << gVid;
-			out << std::string(10, ' ');           // tarpas, kad tilptų į ~18 pločio stulpelį
+			out << std::string(10, ' ');
 			out << std::right << std::setw(8) << gMed << "\n";
 		}
 	}
-
 
 	if (vartotojo_pasirinkimas == 1) std::cout << "Galutinis (Vid.)\n";
 	else if (vartotojo_pasirinkimas == 2) std::cout << "Galutinis (Med.)\n";
@@ -306,7 +331,4 @@ int main() {
 
 	std::cout << "Rezultatai irasyti i faila: " << rz << std::endl;
 	return 0;
-
-
-
 }
