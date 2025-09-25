@@ -56,6 +56,18 @@ void print_col(std::ostream& out, const std::string& text, std::size_t width) {
 }
 //-----------------
 
+static const std::vector<std::string> VARD = {
+	"Jonas","Mantas","Lukas","Dominykas","Tomas","Nojus","Arnas","Kajus",
+	"Paulius","Dovydas","Andrius","Rokas","Benas","Adomas","Martynas",
+	"Ignas","Vilius","Titas","Laurynas","Deividas"
+};
+static const std::vector<std::string> PAV = {
+	"Kazlauskas","Jankauskas","Petrauskas","Stankevičius","Vasiliauskas",
+	"Žukauskas","Šimkus","Paulauskas","Mikalauskas","Pocius",
+	"Grigaitis","Sadauskas","Kavaliauskas","Giedraitis","Noreika",
+	"Valantinas","Bacevičius","Mažeika","Kairys","Čepas"
+};
+
 int main() {
 	const char* pr = "studentai1.txt";
 
@@ -86,6 +98,10 @@ int main() {
 		pr = "studentai_gen.txt";
 
 		std::ofstream gen(pr);
+		//-----
+		std::uniform_int_distribution<size_t> iv(0, VARD.size() - 1);
+		std::uniform_int_distribution<size_t> ip(0, PAV.size() - 1);
+		//-----
 
 		if (!gen) {
 			std::cout << "Nepavyko sukurti failo: " << pr << std::endl;
@@ -99,7 +115,9 @@ int main() {
 		std::uniform_int_distribution<int> distPaz(minP, maxP);
 
 		for (int i = 1; i <= N; ++i) {
-			gen << "Pavarde" << i << " Vardas" << i;
+			const std::string& vardas = VARD[iv(rng)];
+			const std::string& pavarde = PAV[ip(rng)];
+			gen << pavarde << ' ' << vardas;
 			for (int j = 1; j <= K; ++j) gen << " " << distPaz(rng);
 			gen << " " << distPaz(rng) << "\n";
 		}
