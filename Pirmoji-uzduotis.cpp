@@ -67,6 +67,39 @@ static const std::vector<std::string> PAV = {
 	"Grigaitis","Sadauskas","Kavaliauskas","Giedraitis","Noreika",
 	"Valantinas","Bacevičius","Mažeika","Kairys","Čepas"
 };
+//----------------------- rikiavimas
+inline bool less_pavarde_vardas(const Studentas& a, const Studentas& b) {
+	if (a.pavarde != b.pavarde) return a.pavarde < b.pavarde;
+	return a.vardas < b.vardas;
+}
+inline bool less_vardas_pavarde(const Studentas& a, const Studentas& b) {
+	if (a.vardas != b.vardas) return a.vardas < b.vardas;
+	return a.pavarde < b.pavarde;
+}
+
+template <class T, class Less>
+void merge_sort(std::vector<T>& a, Less less) {
+	const std::size_t n = a.size();
+	if (n <= 1) return;
+	std::vector<T> tmp(n);
+	for (std::size_t width = 1; width < n; width *= 2) {
+		for (std::size_t i = 0; i < n; i += 2 * width) {
+			std::size_t l = i;
+			std::size_t m = std::min(i + width, n);
+			std::size_t r = std::min(i + 2 * width, n);
+			std::size_t p = l, q = m, k = l;
+			while (p < m && q < r) {
+				if (!less(a[q], a[p])) tmp[k++] = std::move(a[p++]); 
+				else                    tmp[k++] = std::move(a[q++]);
+			}
+			while (p < m) tmp[k++] = std::move(a[p++]);
+			while (q < r) tmp[k++] = std::move(a[q++]);
+			for (std::size_t t = l; t < r; ++t) a[t] = std::move(tmp[t]);
+		}
+	}
+}
+//-----------------------
+
 
 int main() {
 	const char* pr = "studentai1.txt";
@@ -74,16 +107,24 @@ int main() {
 	int pasirinktas_saltinis = 1;
 	std::cout << "Pasirinkite duomenu saltini (1 - txt failas, 2 - atsitiktinai generuoti domenys): \n";
 	std::cout << "__________________________________________________________\n";
-	std::this_thread::sleep_for(std::chrono::seconds(2));
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	if (!(std::cin >> pasirinktas_saltinis) || (pasirinktas_saltinis != 1 && pasirinktas_saltinis != 2)){
 		std::cout << "Prasome pasirinkti 1 arba 2.\n";
 		std::cout << "Programa nutraukiama.\n";
 		std::exit(1);
 	}
+
+	int mstudentu_kiekis;
+	if (pasirinktas_saltinis == 2) {
+		std::cout << "Pasirinkite didziausia leistina studentu kieki.\n";
+		std::cout << "__________________________________________________________\n";
+		std::cin >> mstudentu_kiekis;
+	}
+
 	// txt generavimas 
 	if (pasirinktas_saltinis == 2) {
 		std::mt19937 rng(std::random_device{}());
-		std::uniform_int_distribution<int> distN(1, 100000);
+		std::uniform_int_distribution<int> distN(1, mstudentu_kiekis);
 		std::uniform_int_distribution<int> distK(5, 25);
 
 		int N = distN(rng); //studentu skaicius
@@ -145,6 +186,16 @@ int main() {
 
 	}
 
+	int rikiavimo_pasirinkimas = 1;
+	std::cout << "Pasirinkite rikiavimo parametra (1 - studento vardas, 2 - studento pavarde)\n";
+	std::cout << "__________________________________________________________\n";
+
+	if (!(std::cin >> rikiavimo_pasirinkimas) || (rikiavimo_pasirinkimas != 1 && rikiavimo_pasirinkimas != 2)) {
+		std::cout << "Prasome pasirinkti 1 arba 2.\n";
+		std::cout << "Programa nutraukiama.\n";
+	std::exit(1);
+
+	}
 	//const char* pr = "studentai1.txt";
 	const char* rz = "rezultatas.txt";
 
@@ -185,6 +236,8 @@ int main() {
 		s.nd.assign(visi_skaiciai.begin(), visi_skaiciai.end() - 1);
 		grupe.push_back(std::move(s));
 	}
+
+
 	if (in.fail() && !in.eof()) {
 		std::cout << "Failo skaityme kilo klaida.\n";
 		return 3;
@@ -198,6 +251,11 @@ int main() {
 		std::cout << "Nepavyko sukurti failo: " << rz << std::endl;
 		return 4;
 	}
+
+	if (rikiavimo_pasirinkimas == 1) merge_sort(grupe, less_vardas_pavarde);
+	else merge_sort(grupe, less_pavarde_vardas);
+
+
 
 	out << std::fixed << std::setprecision(2);
 	
@@ -225,6 +283,8 @@ int main() {
 
 		print_col(out, s.pavarde, 15);
 		print_col(out, s.vardas, 15);
+
+
 
 		if (vartotojo_pasirinkimas == 1) {
 			out << std::right << std::setw(8) << gVid << "\n";
