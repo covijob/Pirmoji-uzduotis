@@ -7,8 +7,8 @@
 #include <sstream>
 #include <algorithm>
 #include <random>
-#include <chrono>
-#include <thread>
+#include <cctype>
+#include <cstdlib>
 
 struct Studentas {
 	std::string vardas;
@@ -40,7 +40,7 @@ double galutinis_vidurkis(const Studentas& s) {
 double galutinis_mediana(const Studentas& s) {
 	return 0.4 * mediana(s.nd) + 0.6 * s.egzaminas;
 }
-//------------
+
 std::size_t u8len(const std::string& s) {
 	std::size_t n = 0;
 	for (unsigned char c : s) {
@@ -54,7 +54,21 @@ void print_col(std::ostream& out, const std::string& text, std::size_t width) {
 	std::size_t len = u8len(text);
 	if (len < width) out << std::string(width - len, ' ');
 }
-//-----------------
+
+bool try_parse_int(const std::string& tok, int& out) {
+	if (tok.empty()) return false;
+	size_t i = 0;
+	if (tok[0] == '+' || tok[0] == '-') i = 1;
+	if (i == tok.size()) return false;
+	for (; i < tok.size(); ++i) if (!std::isdigit((unsigned char)tok[i])) return false;
+	try {
+		long long v = std::stoll(tok);
+		if (v < std::numeric_limits<int>::min() || v > std::numeric_limits<int>::max()) return false;
+		out = (int)v;
+		return true;
+	}
+	catch (...) { return false; }
+}
 
 void ivedimas_is_konsoles(std::vector<Studentas>& grupe) {
 	using std::string;
@@ -77,8 +91,12 @@ void ivedimas_is_konsoles(std::vector<Studentas>& grupe) {
 		getline(std::cin, line);
 		if (!line.empty()) {
 			std::istringstream nds(line);
-			int x;
-			while (nds >> x) s.nd.push_back(x);
+			std::string tok;
+			while (nds >> tok) {
+				int v;
+				if (try_parse_int(tok, v) && v >= 1 && v <= 10) s.nd.push_back(v);
+				else std::cout << "Ignoruojama ND reiksme: '" << tok << "'\n";
+			}
 		}
 
 		for (;;) {
@@ -108,7 +126,7 @@ static const std::vector<std::string> PAV = {
 	"Grigaitis","Sadauskas","Kavaliauskas","Giedraitis","Noreika",
 	"Valantinas","Bacevičius","Mažeika","Kairys","Čepas"
 };
-//----------------------- rikiavimas
+
 inline bool less_pavarde_vardas(const Studentas& a, const Studentas& b) {
 	if (a.pavarde != b.pavarde) return a.pavarde < b.pavarde;
 	return a.vardas < b.vardas;
@@ -139,7 +157,6 @@ void merge_sort(std::vector<T>& a, Less less) {
 		}
 	}
 }
-//-----------------------
 
 int main() {
 	const char* pr = "studentai1.txt";
@@ -252,8 +269,12 @@ int main() {
 			}
 
 			std::vector<int> visi_skaiciai;
-			int x;
-			while (iss >> x) visi_skaiciai.push_back(x);
+			std::string tok;
+			while (iss >> tok) {
+				int v;
+				if (try_parse_int(tok, v) && v >= 1 && v <= 10) visi_skaiciai.push_back(v);
+				else std::cout << nr << " eiluteje ignoruojama reiksme: '" << tok << "'\n";
+			}
 
 			if (visi_skaiciai.empty()) {
 				std::cout << nr << " eiluteje nerasta nei vieno pazymio - studentas praleidziamas.\n";
