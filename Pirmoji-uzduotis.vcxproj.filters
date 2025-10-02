@@ -18,5 +18,51 @@
     <ClCompile Include="Pirmoji-uzduotis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="formatas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generatorius.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ivestis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="skaiciavimas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="formatas.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generatorius.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ivestis.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="skaiciavimas.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sort.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="studentai.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="kietiakiai.txt" />
+    <Text Include="rezultatas.txt" />
+    <Text Include="studentai_gen.txt" />
+    <Text Include="studentai_v1.txt" />
+    <Text Include="studentai_v1_test.txt" />
+    <Text Include="studentai1.txt" />
+    <Text Include="vargsiukai.txt" />
   </ItemGroup>
 </Project>

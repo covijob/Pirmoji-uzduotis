@@ -125,7 +125,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="formatas.cpp" />
+    <ClCompile Include="generatorius.cpp" />
+    <ClCompile Include="ivestis.cpp" />
     <ClCompile Include="Pirmoji-uzduotis.cpp" />
+    <ClCompile Include="skaiciavimas.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="formatas.hpp" />
+    <ClInclude Include="generatorius.hpp" />
+    <ClInclude Include="ivestis.hpp" />
+    <ClInclude Include="skaiciavimas.hpp" />
+    <ClInclude Include="sort.hpp" />
+    <ClInclude Include="studentai.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="kietiakiai.txt" />
+    <Text Include="rezultatas.txt" />
+    <Text Include="studentai1.txt" />
+    <Text Include="studentai_gen.txt" />
+    <Text Include="studentai_v1.txt" />
+    <Text Include="studentai_v1_test.txt" />
+    <Text Include="vargsiukai.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
