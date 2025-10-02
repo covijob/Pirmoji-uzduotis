@@ -158,6 +158,32 @@ void merge_sort(std::vector<T>& a, Less less) {
 	}
 }
 
+void generuoti(std::mt19937& rng, const std::string& failo_vardas,
+	std::size_t N, std::size_t K, int minP = 1, int maxP = 10) {
+
+	std::ofstream out(failo_vardas);
+	if (!out) {
+		std::cerr << "Nepavyko sukurti failo: " << failo_vardas << '\n';
+		return;
+	}
+
+	out << "Vardas Pavarde";
+	for (std::size_t i = 1; i <= K; i++) {
+		out << "ND" << i;
+	}
+	out << "Egz. \n";
+
+	std::uniform_int_distribution<int> distPaz(minP, maxP);
+
+	for (std::size_t j = 1; j <= N; j++) {
+		out << "Vardas" << j << " Pavarde" << j;
+		for (std::size_t k = 1; k <= K; k++) {
+			out << " " << distPaz(rng);
+		}
+		out << " " << distPaz(rng) << "\n";
+	}
+}
+
 int main() {
 	const char* pr = "studentai1.txt";
 
