@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <random>
 #include <cstdlib>
+#include <chrono>
+#include <thread>
+
+
 
 #include "studentai.hpp"
 #include "skaiciavimas.hpp"
@@ -16,8 +20,10 @@
 #include "generatorius.hpp"
 #include "formatas.hpp"
 
-
 int main() {
+    using clock = std::chrono::steady_clock;
+    auto ms = [](auto dt) { return std::chrono::duration_cast<std::chrono::milliseconds>(dt).count(); };
+
     std::ios::sync_with_stdio(false);
 
     std::string pr = "studentai1.txt";
@@ -34,18 +40,26 @@ int main() {
 
     if (pasirinktas_saltinis == 2) {
         std::mt19937 rng(std::random_device{}());
-        std::uniform_int_distribution<int> distK(5, 15);
+        std::uniform_int_distribution<int> distK(6, 7);
         int K = distK(rng);
 
-        std::vector<std::size_t> N_list = { 1000, 10000, 100000, 1000000}; //10000000
+        std::vector<std::size_t> N_list = { 1000, 10000, 100000, 1000000}; 
 
         std::cout << "Generavimas (K=" << K << "):\n";
+        long long gen_total_ms = 0;
         for (auto N : N_list) {
             std::string vardas = "studentai_" + std::to_string(N) + "_K" + std::to_string(K) + ".txt";
+
+            auto t0 = clock::now();
             generuoti_faila(rng, vardas, N, static_cast<std::size_t>(K));
+            auto t1 = clock::now();
+
+            long long took = ms(t1 - t0);
+            gen_total_ms += took;
             sugeneruoti.push_back(vardas);
-            std::cout << "  - Sugeneruotas: " << vardas << "\n";
+            std::cout << "  - Sugeneruotas: " << vardas << " (" << took << " ms)\n";
         }
+        std::cout << "Visu 5 failu generavimas: " << gen_total_ms << " ms\n";
 
         std::cout << "Pasirinkite kuri sugeneruota faila naudoti:\n";
         for (size_t i = 0; i < sugeneruoti.size(); i++) {
@@ -88,6 +102,8 @@ int main() {
     }
     else {
         std::cout << ">>> nuskaitomas txt: " << pr << " ...\n";
+        auto t0 = clock::now();
+
         std::ifstream in(pr);
         if (!in) {
             std::cout << "Klaida atidarant faila: " << pr << std::endl;
@@ -100,7 +116,7 @@ int main() {
 
         while (std::getline(in, eilute)) {
             ++nr;
-            if (nr == 1) continue; 
+            if (nr == 1) continue;
             if (eilute.find_first_not_of(" \t\n\r") == std::string::npos) continue;
 
             std::istringstream iss(eilute);
@@ -125,7 +141,9 @@ int main() {
                 std::cout << "  - Nuskaityta " << irasu << " irasu...\n";
             }
         }
-        std::cout << ">>> NUSKAITYTA: " << irasu << " irasu.\n";
+        auto t1 = clock::now();
+        std::cout << ">>> NUSKAITYTA: " << irasu << " irasu. ("
+            << ms(t1 - t0) << " ms)\n";
     }
 
     if (grupe.empty()) {
@@ -133,12 +151,10 @@ int main() {
         return 0;
     }
 
-    std::cout << ">>> Rikiuojama (" << (rikiavimo_pasirinkimas == 1 ? "vardas" : "pavarde") << ")...\n";
     if (rikiavimo_pasirinkimas == 1) merge_sort(grupe, less_vardas_pavarde);
     else merge_sort(grupe, less_pavarde_vardas);
-    std::cout << ">>> Rikiavimas baigtas.\n";
 
-    std::cout << ">>> Skirstau i vargsiukus / kietiakius...\n";
+    auto t_split0 = clock::now();
     std::vector<Studentas> vargsiukai;
     std::vector<Studentas> kietiakiai;
     vargsiukai.reserve(grupe.size());
@@ -152,13 +168,31 @@ int main() {
         if (galutinis < 5.0) vargsiukai.push_back(s);
         else kietiakiai.push_back(s);
     }
-    std::cout << ">>> Skirstymas baigtas. Vargsiukai: " << vargsiukai.size()
-        << ", Kietiakai: " << kietiakiai.size() << "\n";
+    auto t_split1 = clock::now();
+    std::cout << "Skirstymas i dvi kategorijas: "
+        << ms(t_split1 - t_split0) << " ms.  (Vargsiukai: "
+        << vargsiukai.size() << ", Kietiakiai: " << kietiakiai.size() << ")\n";
 
-    std::cout << ">>> formatuojami rezultatu txt...\n";
-    failo_formatavimas("rezultatas.txt", grupe, vartotojo_pasirinkimas);
+    std::cout << ">>> Kuriami failai...\n";
+    long long write_total_ms = 0;
+
+    auto t_w1_0 = clock::now();
     failo_formatavimas("vargsiukai.txt", vargsiukai, vartotojo_pasirinkimas);
+    auto t_w1_1 = clock::now();
+    long long w_vargsiukai = ms(t_w1_1 - t_w1_0);
+    write_total_ms += w_vargsiukai;
+
+    auto t_w2_0 = clock::now();
     failo_formatavimas("kietiakiai.txt", kietiakiai, vartotojo_pasirinkimas);
+    auto t_w2_1 = clock::now();
+    long long w_kietiakiai = ms(t_w2_1 - t_w2_0);
+    write_total_ms += w_kietiakiai;
+
+    failo_formatavimas("rezultatas.txt", grupe, vartotojo_pasirinkimas);
+
+    std::cout << "  - vargsiukai.txt: " << w_vargsiukai << " ms\n";
+    std::cout << "  - kietiakiai.txt: " << w_kietiakiai << " ms\n";
+    std::cout << "Isvedimo i du failus suma: " << write_total_ms << " ms\n";
     std::cout << ">>> Viskas baigta.\n";
 
     return 0;
