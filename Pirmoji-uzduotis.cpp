@@ -19,6 +19,9 @@
 #include "sort.hpp"
 #include "generatorius.hpp"
 #include "formatas.hpp"
+#include "streaming.hpp"
+
+
 
 int main() {
     using clock = std::chrono::steady_clock;
@@ -43,7 +46,7 @@ int main() {
         std::uniform_int_distribution<int> distK(6, 7);
         int K = distK(rng);
 
-        std::vector<std::size_t> N_list = { 1000, 10000, 100000, 1000000}; 
+        std::vector<std::size_t> N_list = { 10000000 };
 
         std::cout << "Generavimas (K=" << K << "):\n";
         long long gen_total_ms = 0;
@@ -96,60 +99,18 @@ int main() {
 
     std::vector<Studentas> grupe;
 
-    if (pasirinktas_saltinis == 3) {
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        ivedimas_is_konsoles(grupe);
-    }
-    else {
-        std::cout << ">>> nuskaitomas txt: " << pr << " ...\n";
-        auto t0 = clock::now();
-
-        std::ifstream in(pr);
-        if (!in) {
-            std::cout << "Klaida atidarant faila: " << pr << std::endl;
-            return 1;
-        }
-
-        std::string eilute;
-        size_t nr = 0;
-        std::size_t irasu = 0;
-
-        while (std::getline(in, eilute)) {
-            ++nr;
-            if (nr == 1) continue;
-            if (eilute.find_first_not_of(" \t\n\r") == std::string::npos) continue;
-
-            std::istringstream iss(eilute);
-            Studentas s;
-            if (!(iss >> s.pavarde >> s.vardas)) continue;
-
-            std::vector<int> visi_skaiciai;
-            std::string tok;
-            while (iss >> tok) {
-                int v;
-                if (try_parse_int(tok, v) && v >= 1 && v <= 10) visi_skaiciai.push_back(v);
-            }
-            if (visi_skaiciai.empty()) continue;
-
-            s.egzaminas = visi_skaiciai.back();
-            s.nd.assign(visi_skaiciai.begin(), visi_skaiciai.end() - 1);
-
-            grupe.push_back(std::move(s));
-            ++irasu;
-
-            if (irasu % 100000 == 0) {
-                std::cout << "  - Nuskaityta " << irasu << " irasu...\n";
-            }
-        }
-        auto t1 = clock::now();
-        std::cout << ">>> NUSKAITYTA: " << irasu << " irasu. ("
-            << ms(t1 - t0) << " ms)\n";
-    }
-
-    if (grupe.empty()) {
-        std::cout << "Nera nei vieno studento.\n";
+    if (pasirinktas_saltinis != 3) {
+        split_streaming(pr, vartotojo_pasirinkimas);
         return 0;
     }
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    ivedimas_is_konsoles(grupe);
+
+    if (grupe.empty()) {std::cout << " Nera nei vieno studento.\n";
+        return 0;
+}
 
     if (rikiavimo_pasirinkimas == 1) merge_sort(grupe, less_vardas_pavarde);
     else merge_sort(grupe, less_pavarde_vardas);

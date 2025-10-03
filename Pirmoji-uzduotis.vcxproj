@@ -130,6 +130,7 @@
     <ClCompile Include="ivestis.cpp" />
     <ClCompile Include="Pirmoji-uzduotis.cpp" />
     <ClCompile Include="skaiciavimas.cpp" />
+    <ClCompile Include="streaming.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -142,6 +143,7 @@
     <ClInclude Include="ivestis.hpp" />
     <ClInclude Include="skaiciavimas.hpp" />
     <ClInclude Include="sort.hpp" />
+    <ClInclude Include="streaming.hpp" />
     <ClInclude Include="studentai.hpp" />
   </ItemGroup>
   <ItemGroup>

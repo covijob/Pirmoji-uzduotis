@@ -30,6 +30,9 @@
     <ClCompile Include="skaiciavimas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="streaming.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -53,6 +56,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="studentai.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="streaming.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
