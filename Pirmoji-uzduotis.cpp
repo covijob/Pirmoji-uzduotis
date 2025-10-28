@@ -11,8 +11,6 @@
 #include <chrono>
 #include <thread>
 
-
-
 #include "studentai.hpp"
 #include "skaiciavimas.hpp"
 #include "ivestis.hpp"
@@ -20,8 +18,6 @@
 #include "generatorius.hpp"
 #include "formatas.hpp"
 #include "streaming.hpp"
-
-
 
 int main() {
     using clock = std::chrono::steady_clock;
@@ -46,7 +42,7 @@ int main() {
         std::uniform_int_distribution<int> distK(6, 7);
         int K = distK(rng);
 
-        std::vector<std::size_t> N_list = { 10000000 };
+        std::vector<std::size_t> N_list = { 10000000};
 
         std::cout << "Generavimas (K=" << K << "):\n";
         long long gen_total_ms = 0;
@@ -100,17 +96,26 @@ int main() {
     std::vector<Studentas> grupe;
 
     if (pasirinktas_saltinis != 3) {
-        split_streaming(pr, vartotojo_pasirinkimas);
+        long long t_read_ms = 0, t_split_ms = 0, t_write_ms = 0;
+        split_streaming(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas,
+            &t_read_ms, &t_split_ms, &t_write_ms);
+
+        std::cout << "--------------------------------------------------\n";
+        std::cout << "Santrauka:\n";
+        std::cout << "  Nuskaitymas: " << t_read_ms << " ms\n";
+        std::cout << "  Skirstymas:  " << t_split_ms << " ms\n";
+        std::cout << "  Isvedimas:   " << t_write_ms << " ms\n";
+        std::cout << "  Bendra:      " << (t_read_ms + t_split_ms + t_write_ms) << " ms\n";
         return 0;
     }
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
     ivedimas_is_konsoles(grupe);
 
-    if (grupe.empty()) {std::cout << " Nera nei vieno studento.\n";
+    if (grupe.empty()) {
+        std::cout << " Nera nei vieno studento.\n";
         return 0;
-}
+    }
 
     if (rikiavimo_pasirinkimas == 1) merge_sort(grupe, less_vardas_pavarde);
     else merge_sort(grupe, less_pavarde_vardas);
@@ -125,9 +130,9 @@ int main() {
         double galutinis;
         if (vartotojo_pasirinkimas == 1) galutinis = galutinis_vidurkis(s);
         else if (vartotojo_pasirinkimas == 2) galutinis = galutinis_mediana(s);
-        else galutinis = galutinis_vidurkis(s);
+        else                                   galutinis = galutinis_vidurkis(s);
         if (galutinis < 5.0) vargsiukai.push_back(s);
-        else kietiakiai.push_back(s);
+        else                 kietiakiai.push_back(s);
     }
     auto t_split1 = clock::now();
     std::cout << "Skirstymas i dvi kategorijas: "
