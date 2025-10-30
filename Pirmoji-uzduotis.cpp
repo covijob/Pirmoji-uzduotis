@@ -95,19 +95,49 @@ int main() {
         std::cout << "Prasome pasirinkti 1 arba 2: ";
     }
 
+    int konteineris = 1;
+    std::cout << "Pasirinkite konteineri (1 - std::vector, 2 - std::list): \n";
+    std::cout << "__________________________________________________________\n";
+    while (!(std::cin >> konteineris) || (konteineris != 1 && konteineris != 2)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Prasome pasirinkti 1 arba 2: ";
+    }
+
     std::vector<Studentas> grupe;
 
+ 
     if (pasirinktas_saltinis != 3) {
-        long long t_read_ms = 0, t_split_ms = 0, t_write_ms = 0;
-        split_streaming(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas,
-            &t_read_ms, &t_split_ms, &t_write_ms);
+        int versija = 0;
+        std::cout << "Pasirinkite versija (1 - v0.2 streaming, 2 - v0.3 konteineriai): \n";
+        std::cout << "__________________________________________________________\n";
+        while (!(std::cin >> versija) || (versija != 1 && versija != 2)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Prasome pasirinkti 1 arba 2: ";
+        }
 
-        std::cout << "--------------------------------------------------\n";
-        std::cout << "Santrauka:\n";
-        std::cout << "  Nuskaitymas: " << t_read_ms << " ms\n";
-        std::cout << "  Skirstymas:  " << t_split_ms << " ms\n";
-        std::cout << "  Isvedimas:   " << t_write_ms << " ms\n";
-        std::cout << "  Bendra:      " << (t_read_ms + t_split_ms + t_write_ms) << " ms\n";
+        if (versija == 1) {
+            long long t_read_ms = 0, t_split_ms = 0, t_write_ms = 0;
+            split_streaming(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas,
+                &t_read_ms, &t_split_ms, &t_write_ms);
+
+            std::cout << "--------------------------------------------------\n";
+            std::cout << "Santrauka (v0.2 streaming):\n";
+            std::cout << "  Nuskaitymas: " << t_read_ms << " ms\n";
+            std::cout << "  Skirstymas:  " << t_split_ms << " ms\n";
+            std::cout << "  Isvedimas:   " << t_write_ms << " ms\n";
+            std::cout << "  Bendra:      " << (t_read_ms + t_split_ms + t_write_ms) << " ms\n";
+        }
+        else {
+            if (konteineris == 1) {
+                run_v03<VectorTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+            }
+            else {
+                run_v03<ListTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+            }
+        }
+
         return 0;
     }
 
