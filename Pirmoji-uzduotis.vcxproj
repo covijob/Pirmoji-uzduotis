@@ -131,6 +131,8 @@
     <ClCompile Include="Pirmoji-uzduotis.cpp" />
     <ClCompile Include="skaiciavimas.cpp" />
     <ClCompile Include="streaming.cpp" />
+    <ClCompile Include="v03_api.hpp" />
+    <ClCompile Include="v03_runner.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -141,6 +143,7 @@
     <ClInclude Include="formatas.hpp" />
     <ClInclude Include="generatorius.hpp" />
     <ClInclude Include="ivestis.hpp" />
+    <ClInclude Include="konteineriu_pasirinkimas.hpp" />
     <ClInclude Include="skaiciavimas.hpp" />
     <ClInclude Include="sort.hpp" />
     <ClInclude Include="streaming.hpp" />

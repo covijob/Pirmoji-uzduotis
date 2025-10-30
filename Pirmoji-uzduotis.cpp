@@ -18,6 +18,8 @@
 #include "generatorius.hpp"
 #include "formatas.hpp"
 #include "streaming.hpp"
+#include "konteineriu_pasirinkimas.hpp"
+#include "v03_runner.hpp"
 
 int main() {
     using clock = std::chrono::steady_clock;

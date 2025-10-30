@@ -33,6 +33,12 @@
     <ClCompile Include="streaming.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="v03_api.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="v03_runner.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitattributes" />
@@ -59,6 +65,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="streaming.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="konteineriu_pasirinkimas.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
