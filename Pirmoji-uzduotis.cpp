@@ -44,7 +44,7 @@ int main() {
         std::uniform_int_distribution<int> distK(6, 7);
         int K = distK(rng);
 
-        std::vector<std::size_t> N_list = { 10000000};
+        std::vector<std::size_t> N_list = { 1000};
 
         std::cout << "Generavimas (K=" << K << "):\n";
         long long gen_total_ms = 0;

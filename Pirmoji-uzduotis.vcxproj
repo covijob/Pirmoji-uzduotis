@@ -131,6 +131,7 @@
     <ClCompile Include="Pirmoji-uzduotis.cpp" />
     <ClCompile Include="skaiciavimas.cpp" />
     <ClCompile Include="streaming.cpp" />
+    <ClCompile Include="v03_api.cpp" />
     <ClCompile Include="v03_api.hpp" />
     <ClCompile Include="v03_runner.hpp" />
   </ItemGroup>
