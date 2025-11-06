@@ -19,7 +19,7 @@ void run_v03(const std::string& path, int method, int rikiavimas) {
 
     write_groups<Tag>(varg, kiet, method, &t_write);
 
-    std::cout << "=== v0.3 (" << (std::is_same_v<Tag, VectorTag> ? "vector" : "list") << ") ===\n";
+    std::cout << "v0.3 (" << (std::is_same_v<Tag, VectorTag> ? "vector" : "list") << ") ===\n";
     std::cout << "Skaitymas: " << t_read << " ms\n";
     std::cout << "Skaidymas: " << t_split << " ms\n";
     std::cout << "Rikiavimas: " << t_sort << " ms\n";
@@ -27,6 +27,8 @@ void run_v03(const std::string& path, int method, int rikiavimas) {
     std::cout << "Is viso: " << (t_read + t_split + t_sort + t_write) << " ms\n";
     if (!all.empty()) {
         std::cout << "Pirmo studento atminties adresas: " << &(*all.begin()) << "\n";
+        std::cout << "---------------------------------------\n";
+
     }
 
 }
