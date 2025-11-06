@@ -45,7 +45,7 @@ int main() {
         std::uniform_int_distribution<int> distK(6, 7);
         int K = distK(rng);
 
-        std::vector<std::size_t> N_list = { 1000};
+        std::vector<std::size_t> N_list = { 1000, 10000, 100000 };
 
         std::cout << "Generavimas (K=" << K << "):\n";
         long long gen_total_ms = 0;
@@ -61,7 +61,8 @@ int main() {
             sugeneruoti.push_back(vardas);
             std::cout << "  - Sugeneruotas: " << vardas << " (" << took << " ms)\n";
         }
-        std::cout << "Visu 5 failu generavimas: " << gen_total_ms << " ms\n";
+
+        std::cout << "Visu " << sugeneruoti.size() << " failu generavimas: " << gen_total_ms << " ms\n";
 
         std::cout << "Pasirinkite kuri sugeneruota faila naudoti:\n";
         for (size_t i = 0; i < sugeneruoti.size(); i++) {
@@ -72,7 +73,7 @@ int main() {
             pasirinktas_failas < 1 || pasirinktas_failas >(int)sugeneruoti.size()) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Blogas pasirinkimas. Bandykite dar kartą: ";
+            std::cout << "Blogas pasirinkimas. Bandykite dar karta: ";
         }
         pr = sugeneruoti[pasirinktas_failas - 1];
         std::cout << ">> Pasirinktas failas: " << pr << "\n";
@@ -107,7 +108,6 @@ int main() {
 
     std::vector<Studentas> grupe;
 
- 
     if (pasirinktas_saltinis != 3) {
         int versija = 0;
         std::cout << "Pasirinkite versija (1 - v0.2 streaming, 2 - v0.3 konteineriai): \n";
@@ -131,14 +131,23 @@ int main() {
             std::cout << "  Bendra:      " << (t_read_ms + t_split_ms + t_write_ms) << " ms\n";
         }
         else {
-            if (konteineris == 1) {
-                run_v03<VectorTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+            if (pasirinktas_saltinis == 2 && !sugeneruoti.empty()) {
+                for (const auto& failas : sugeneruoti) {
+                    std::cout << "\n=== Testas su failu: " << failas << " ===\n";
+                    run_v03<VectorTag>(failas, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+                    run_v03<ListTag>(failas, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+                }
             }
             else {
-                run_v03<ListTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+                if (konteineris == 1) {
+                    run_v03<VectorTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+                }
+                else {
+                    run_v03<ListTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+                }
             }
 
-            std::cout << "\n--- Memory address diagnostics ---\n";
+            std::cout << "\n--- Atminties adresu diagnostika ---\n";
             Studentas s1, s2;
             std::vector<Studentas> v;
             std::list<Studentas> l;
@@ -146,14 +155,13 @@ int main() {
             v.push_back(s2);
             l.push_back(s1);
             l.push_back(s2);
-            std::cout << "Vector element 1: " << &v[0] << "\n";
-            std::cout << "Vector element 2: " << &v[1] << "\n";
-            std::cout << "List element 1: " << &(*l.begin()) << "\n";
+            std::cout << "Vector elementas 1: " << &v[0] << "\n";
+            std::cout << "Vector elementas 2: " << &v[1] << "\n";
+            std::cout << "List elementas 1: " << &(*l.begin()) << "\n";
             auto it = l.begin();
             ++it;
-            std::cout << "List element 2: " << &(*it) << "\n";
+            std::cout << "List elementas 2: " << &(*it) << "\n";
         }
-
 
         return 0;
     }
