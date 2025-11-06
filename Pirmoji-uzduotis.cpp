@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <list>
 #include <string>
 #include <limits>
 #include <sstream>
@@ -136,7 +137,23 @@ int main() {
             else {
                 run_v03<ListTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
             }
+
+            std::cout << "\n--- Memory address diagnostics ---\n";
+            Studentas s1, s2;
+            std::vector<Studentas> v;
+            std::list<Studentas> l;
+            v.push_back(s1);
+            v.push_back(s2);
+            l.push_back(s1);
+            l.push_back(s2);
+            std::cout << "Vector element 1: " << &v[0] << "\n";
+            std::cout << "Vector element 2: " << &v[1] << "\n";
+            std::cout << "List element 1: " << &(*l.begin()) << "\n";
+            auto it = l.begin();
+            ++it;
+            std::cout << "List element 2: " << &(*it) << "\n";
         }
+
 
         return 0;
     }
