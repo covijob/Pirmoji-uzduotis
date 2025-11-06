@@ -134,27 +134,8 @@ int main() {
             if (pasirinktas_saltinis == 2 && !sugeneruoti.empty()) {
                 for (const auto& failas : sugeneruoti) {
                     std::cout << "\n=== Testas su failu: " << failas << " ===\n";
-                    const int kartai = 3;
-                    long long vector_total = 0, list_total = 0;
-
-                    for (int i = 0; i < kartai; i++) {
-                        std::cout << "Bėgimas #" << i + 1 << " (vector)\n";
-                        auto t0 = std::chrono::steady_clock::now();
-                        run_v03<VectorTag>(failas, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
-                        auto t1 = std::chrono::steady_clock::now();
-                        vector_total += std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-
-                        std::cout << "Bėgimas #" << i + 1 << " (list)\n";
-                        t0 = std::chrono::steady_clock::now();
-                        run_v03<ListTag>(failas, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
-                        t1 = std::chrono::steady_clock::now();
-                        list_total += std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
-                    }
-
-                    std::cout << "--- Vidurkiai po " << kartai << " bėgimų ---\n";
-                    std::cout << "Vector vidurkis: " << vector_total / kartai << " ms\n";
-                    std::cout << "List vidurkis:   " << list_total / kartai << " ms\n";
-                    std::cout << "-------------------------------------------\n";
+                    run_v03<VectorTag>(failas, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+                    run_v03<ListTag>(failas, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
                 }
 
             }

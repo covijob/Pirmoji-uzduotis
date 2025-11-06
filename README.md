@@ -30,3 +30,28 @@ Skaidymas: 26 ms
 Rikiavimas: 41 ms
 Rasymas: 33 ms
 Is viso: 167 ms
+
+### Vidurkių rezultatai (3 bėgimai)
+
+Kiekvienas testas buvo vykdomas 3 kartus, o lentelėje pateikiami vidutiniai laikai milisekundėmis (ms):
+
+| Įrašų kiekis | Vector vidurkis (ms) | List vidurkis (ms) |
+|---------------|----------------------|--------------------|
+| 1 000         | —                    | —                  |
+| 10 000        | —                    | —                  |
+| 100 000       | —                    | —                  |
+| 1mil          | –
+| 10mil         | –               
+|
+
+
+> Pastaba: lentelė bus užpildyta atlikus faktinius testus.  
+> Visi bėgimai buvo atlikti tame pačiame kompiuteryje, su vienoda apkrova.
+
+### Sistemos informacija
+- **Procesorius: 12th gen Intel i7-12650H
+- **Operatyvioji atmintis (RAM): 16GB
+- **Diskas: SSD
+- **Operacinė sistema:**  Windows 11, 64-bit
+
+
