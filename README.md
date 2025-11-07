@@ -20,6 +20,9 @@ BENCH MARK TESTAS
 > Norint plaiesti bench mark testą su atsitiktinai sugeneruotais duomenimis *bench_runner.cpp* ĮTRAUKIAME į projektą,
 o *Pirmoji-uzduotis.cpp* nustatome NEĮTRAUKTI.
 > Tada galime paleisti programą ir su sugeneruotais failais bus vykdomas bench mark testas, kuris nustatys veiksmų su failais laikus.
+BENCH v1.0
+>Siekiant atlikti testą (v1.0) darome tą patį tik su *bench_auto.cpp*
+
 
 
 ### Pavyzdinė išvestis
@@ -45,6 +48,39 @@ Is viso: 167 ms
 - Diskas: SSD
 - Operacinė sistema:  Windows 11, 64-bit
 *Nuadojama Visual Studio 2022*
+
+###  Pagrindiniai vykdomieji failai
+
+
+ **Pirmoji-uzduotis.cpp** | Pagrindinis programos įėjimo taškas (`main`). Leidžia vartotojui pasirinkti duomenų šaltinį (failą, generavimą ar rankinį įvedimą), rezultatų skaičiavimo metodą (vidurkis/mediana), rikiavimo kriterijų bei konteinerio tipą. |
+ **bench_auto.cpp** | Automatinio testavimo modulis, kuris suranda visus `studentai_*.txt` failus kataloge ir paleidžia juos matuojant spartos rezultatus visoms strategijoms ir konteineriams. Naudojamas konteinerių (`vector`, `list`) palyginimui. |
+ **bench_runner.cpp** | Rankinio testavimo versija (naudota vidinio tikrinimo metu). Leidžia paleisti vieną konkretų testą su pasirinktu failu. |
+
+---
+
+### Duomenų apdorojimo moduliai 
+
+ **studentai.hpp** | Apibrėžia struktūrą `Studentas`, kuri saugo vardą, pavardę, pažymius ir egzamino rezultatą. Taip pat pateikia funkcijas duomenų palyginimui ir galutinio pažymio skaičiavimui. |
+ **ivestis.hpp / ivestis.cpp** | Atsakingi už duomenų įvedimą – tiek iš vartotojo konsolės, tiek iš failų. Apdoroja eilutes ir konvertuoja jas į `Studentas` objektus. |
+ **skaiciavimas.hpp / skaiciavimas.cpp** | Realizuoja pažymio skaičiavimo logiką. Naudojamos dvi pagrindinės funkcijos: pagal **vidurkį** ir pagal **medianą**. |
+ **sort.hpp** | Rikiavimo funkcijos: rikiuoja studentus pagal vardą, pavardę arba galutinį pažymį naudojant `merge_sort` algoritmą. |
+ **formatas.hpp / formatas.cpp** | Duomenų išvedimo formatavimas – atsakingi už rezultatų išrašymą į failus (`vargsiukai.txt`, `kietiakiai.txt`, `rezultatas.txt`) tinkama struktūra. |
+ **generatorius.hpp / generatorius.cpp** | Atsitiktinių studentų duomenų generatorius. Naudoja `std::mt19937` generatorių, kad sukurtų testinius failus su tūkstančiais ar milijonais įrašų. |
+
+###  Algoritmų ir konteinerių valdymo dalys
+
+ **streaming.hpp / streaming.cpp** | Optimizuotos funkcijos, leidžiančios skaityti ir rašyti didelius duomenų kiekius naudojant efektyvų srautų (`stream`) apdorojimą. |
+ **konteineriu_pasirinkimas.hpp** | Apibrėžia šabloninį tipą `ContainerT<Tag, T>`, leidžiantį programai lengvai perjungti tarp `std::vector` ir `std::list` konteinerių be kodo dubliavimo. |
+ **v03_api.hpp / v03_api.cpp** | Įgyvendina tris duomenų skirstymo strategijas (`partition_copy`, `remove_if`, `partition`) ir jas pritaiko skirtingiems konteineriams. Matavimai leidžia palyginti skirtingų strategijų spartą. |
+ **v03_runner.hpp** | Pagrindinis vykdymo modulis, kuris apjungia skaitymą, skirstymą, rikiavimą ir rašymą į vieną procesą. Atlieka spartos matavimus bei atminties analizę. |
+
+
+
+### Pagalbiniai ir išvesties failai
+
+ **studentai_1000_K6.txt**, **studentai_10000_K6.txt**, ... | Sugeneruoti testavimo duomenų failai su skirtingais įrašų kiekiais (1 000 – 10 000 000). |
+ **vargsiukai.txt / kietiakiai.txt / rezultatas.txt** | Programos sugeneruoti rezultatai – suskirstyti studentai pagal galutinį pažymį (žemiau arba aukščiau 5). |
+ **studentai_gen.txt / studentai_v1.txt / studentai_v1_test.txt** | Vidiniai testiniai duomenų failai, naudoti kūrimo ir derinimo metu. |
 
 
 ### Rašomas bendras kompiliavimo laikas su automatiniu benchmark testu
@@ -211,16 +247,50 @@ Skirstymas vykdomas vietoje, viename konteineryje naudojant `std::partition`.
 
 ---
 
-### Testavimo planas
-Bus atliktas visų trijų strategijų palyginimas, matuojant **skaidymo laiką** (ms) ir **atminties naudojimą** skirtingiems duomenų kiekiams:  
-| Įrašų kiekis | Strategija 1 | Strategija 2 | Strategija 3 |
-|---------------|---------------|---------------|---------------|
-| 1 000         | 
-| 10 000        | 
-| 100 000       | 
-| 1mil          |
+## Testavimo rezultatai ir analizė
 
-*10 mil. kol kas nerasome, del laiko taupymo*
+### Rezultatai naudojant `std::vector`
+
+| Įrašų kiekis | Strategija 1 (`partition_copy`) | Strategija 2 (`remove_if`) | Strategija 3 (`partition`) |
+|---------------|---------------------------------|-----------------------------|-----------------------------|
+| 1 000         | 70 ms                           |                       71 ms | 78 ms                       |
+| 10 000        | 729 ms                          | 690 ms                      | 739 ms                      |
+| 100 000       | 8 262 ms                        | 7 869 ms                    | 9 321 ms                    |
+| 1 000 000     | 86 714 ms                       | 88 835 ms                   | 95 620 ms                   |
+
+---
+
+### Rezultatai naudojant `std::list`
+
+| Įrašų kiekis | Strategija 1 (`partition_copy`) | Strategija 2 (`remove_if`) | Strategija 3 (`partition`) |
+|---------------|---------------------------------|-----------------------------|-----------------------------|
+| 1 000         | 64 ms                           | 68 ms                       | 73 ms |
+| 10 000        | 579 ms                          |                      600 ms | 631 ms | 
+| 100 000       | 6 243 ms                        |                    6 261 ms | 6 336 ms |
+| 1 000 000     | 61 407 ms                       | 61 038 ms                   | 61 994 ms |
 
 
+---
+
+### Analizė
+
+- **Greitis:**  
+  - Mažesniems duomenų kiekiams (`≤100k`) `std::vector` veikė greičiau nei `std::list`.  
+  - Su labai dideliais failais (`1 mln.` įrašų) `std::list` veikė stabiliau ir su mažesniais laiko svyravimais.  
+
+- **Strategijų palyginimas:**  
+  - 1 ir 2 strategijos (`partition_copy`, `remove_if`) buvo artimos pagal laiką.  
+  - 3 strategija (`partition`) buvo kiek lėtesnė `vector` atveju, bet našesnė `list` kontekste.  
+
+- **Atminties sąnaudos:**  
+  - `partition_copy` naudoja papildomą atmintį dėl naujų konteinerių kūrimo.  
+  - `remove_if` ir `partition` dirba efektyviau su atmintimi.  
+
+
+
+### Išvados
+
+Bendra išvada:
+Efektyviausias derinys dideliems duomenų kiekiams yra `std::list` su 3 strategija (`partition`),  
+o mažesniems – `std::vector` su 2 strategija (`remove_if`).
 

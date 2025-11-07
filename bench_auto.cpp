@@ -5,15 +5,16 @@
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
+#include <system_error>
 
 #include "konteineriu_pasirinkimas.hpp"
 #include "skaiciavimas.hpp"
 #include "v03_api.hpp"
 
 namespace fs = std::filesystem;
-using clock_t = std::chrono::steady_clock;
+using Steady = std::chrono::steady_clock;
 
-static inline long long ms(std::chrono::steady_clock::time_point a, std::chrono::steady_clock::time_point b) {
+static inline long long ms(Steady::time_point a, Steady::time_point b) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(b - a).count();
 }
 
@@ -21,6 +22,55 @@ static inline double grade_by(int method, const Studentas& s) {
     if (method == 2) return galutinis_mediana(s);
     return galutinis_vidurkis(s);
 }
+
+static void try_collect_from(const fs::path& dir, std::vector<std::string>& out) {
+    std::error_code ec;
+    if (!fs::exists(dir, ec) || !fs::is_directory(dir, ec)) return;
+    for (fs::directory_iterator it(dir, ec); !ec && it != fs::directory_iterator(); it.increment(ec)) {
+        const auto& p = it->path();
+        if (!it->is_regular_file(ec)) continue;
+        auto name = p.filename().string();
+        if (name.rfind("studentai_", 0) == 0 && p.extension() == ".txt") {
+            out.push_back(p.string());
+        }
+    }
+}
+
+static std::vector<std::string> collect_files() {
+    std::vector<std::string> files;
+    fs::path base = fs::current_path();
+
+    std::vector<fs::path> search_paths = {
+        base,
+        base.parent_path(),
+        base.parent_path().parent_path(),
+        base / "Debug",
+        base / "x64" / "Debug"
+    };
+
+    std::error_code ec;
+    for (const auto& dir : search_paths) {
+        if (!fs::exists(dir, ec) || !fs::is_directory(dir, ec)) continue;
+        for (auto it = fs::directory_iterator(dir, ec); it != fs::directory_iterator(); it.increment(ec)) {
+            if (ec) continue;
+            const auto& p = it->path();
+            auto name = p.filename().string();
+            if (name.rfind("studentai_", 0) == 0 && p.extension() == ".txt") {
+                files.push_back(p.string());
+            }
+        }
+    }
+
+    std::sort(files.begin(), files.end());
+    files.erase(std::unique(files.begin(), files.end()), files.end());
+
+    std::cout << "Rasti failai:\n";
+    for (const auto& f : files) std::cout << " - " << f << "\n";
+    std::cout.flush();
+
+    return files;
+}
+
 
 template<typename Tag>
 void bench_one_file(const std::string& path, int method, int rikiavimas, int strategy) {
@@ -30,11 +80,11 @@ void bench_one_file(const std::string& path, int method, int rikiavimas, int str
 
     ContainerT<Tag, Studentas> varg, kiet;
 
-    auto t0 = clock_t::now();
-
     auto is_varg = [method](const Studentas& s) {
         return grade_by(method, s) < 5.0;
         };
+
+    auto t0 = Steady::now();
 
     if (strategy == 1) {
         varg.clear(); kiet.clear();
@@ -62,14 +112,13 @@ void bench_one_file(const std::string& path, int method, int rikiavimas, int str
         kiet.insert(kiet.end(), mid, all.end());
     }
 
-    auto t1 = clock_t::now();
+    auto t1 = Steady::now();
     t_split = ms(t0, t1);
 
     sort_groups<Tag>(varg, kiet, rikiavimas, &t_sort);
     write_groups<Tag>(varg, kiet, method, &t_write);
 
-    std::cout << "["
-        << (std::is_same_v<Tag, VectorTag> ? "vector" : "list")
+    std::cout << "[" << (std::is_same_v<Tag, VectorTag> ? "vector" : "list")
         << "] file=" << path
         << " strategy=" << strategy
         << " read=" << t_read << "ms"
@@ -77,34 +126,39 @@ void bench_one_file(const std::string& path, int method, int rikiavimas, int str
         << " sort=" << t_sort << "ms"
         << " write=" << t_write << "ms"
         << " total=" << (t_read + t_split + t_sort + t_write) << "ms\n";
+    std::cout.flush();
 }
 
 int main() {
-    std::vector<std::string> files;
-    for (const auto& e : fs::directory_iterator(".")) {
-        if (!e.is_regular_file()) continue;
-        auto p = e.path().string();
-        if (p.find("studentai_") != std::string::npos && p.rfind(".txt") == p.size() - 4) {
-            files.push_back(p);
-        }
-    }
+    std::cout << "Benchmark start\n";
+    std::cout.flush();
+
+    auto files = collect_files();
+    std::cout << "Found " << files.size() << " files\n";
+    std::cout.flush();
+
     if (files.empty()) {
-        std::cout << "No studentai_*.txt files found.\n";
+        std::cout << "No studentai_*.txt files near executable\n";
         return 0;
     }
-    std::sort(files.begin(), files.end());
 
     int method = 1;
     int rikiavimas = 1;
 
-    std::cout << "Benchmark start\n";
     for (const auto& f : files) {
+        std::cout << "\n=== Analyzing file: " << f << " ===\n";
+        std::cout.flush();
+
         for (int s = 1; s <= 3; ++s) {
-            bench_one_file<VectorTag>(f, method, rikiavimas, s);
-            bench_one_file<ListTag>(f, method, rikiavimas, s);
+            try { bench_one_file<VectorTag>(f, method, rikiavimas, s); }
+            catch (const std::exception& e) { std::cout << "vector error: " << e.what() << "\n"; }
+            try { bench_one_file<ListTag>(f, method, rikiavimas, s); }
+            catch (const std::exception& e) { std::cout << "list error: " << e.what() << "\n"; }
         }
-        std::cout << "----\n";
+        std::cout << "---- Done file ----\n";
+        std::cout.flush();
     }
-    std::cout << "Benchmark done\n";
+
+    std::cout << "\nBenchmark done\n";
     return 0;
 }
