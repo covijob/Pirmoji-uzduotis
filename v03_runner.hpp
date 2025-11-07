@@ -6,6 +6,19 @@
 #include "konteineriu_pasirinkimas.hpp"
 #include "v03_api.hpp"
 
+template<typename Tag>
+void split_groups_remove(ContainerT<Tag, Studentas>& all,
+    ContainerT<Tag, Studentas>& varg,
+    ContainerT<Tag, Studentas>& kiet,
+    int method,
+    long long* out_split_ms);
+
+template<typename Tag>
+void split_groups_inplace(ContainerT<Tag, Studentas>& all,
+    ContainerT<Tag, Studentas>& varg,
+    ContainerT<Tag, Studentas>& kiet,
+    int method,
+    long long* out_split_ms);
 
 template<typename Tag>
 void run_v03(const std::string& path, int method, int rikiavimas) {
