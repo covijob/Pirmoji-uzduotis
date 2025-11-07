@@ -199,3 +199,18 @@ template void sort_groups<VectorTag>(ContainerT<VectorTag, Studentas>&, Containe
 template void sort_groups<ListTag>(ContainerT<ListTag, Studentas>&, ContainerT<ListTag, Studentas>&, int, long long*);
 template void write_groups<VectorTag>(const ContainerT<VectorTag, Studentas>&, const ContainerT<VectorTag, Studentas>&, int, long long*);
 template void write_groups<ListTag>(const ContainerT<ListTag, Studentas>&, const ContainerT<ListTag, Studentas>&, int, long long*);
+
+template<typename Tag>
+void split_groups_remove(ContainerT<Tag, Studentas>& all,
+ContainerT<Tag, Studentas>& varg,
+ContainerT<Tag, Studentas>& kiet,
+int method,
+long long* out_split_ms);
+
+template<typename Tag>
+void split_groups_inplace(ContainerT<Tag, Studentas>& all,
+ContainerT<Tag, Studentas>& varg,
+ContainerT<Tag, Studentas>& kiet,
+int method,
+long long* out_split_ms);
+
