@@ -73,6 +73,40 @@ void split_groups(ContainerT<Tag, Studentas>& all,
 }
 
 template<typename Tag>
+void split_groups_remove(ContainerT<Tag, Studentas>& all,
+    ContainerT<Tag, Studentas>& varg,
+    ContainerT<Tag, Studentas>& kiet,
+    int method,
+    long long* out_split_ms) {
+    auto t0 = std::chrono::steady_clock::now();
+
+    varg.clear();
+    kiet.clear();
+
+    if constexpr (std::is_same_v<Tag, VectorTag>) {
+        varg.reserve(all.size());
+    }
+
+    auto is_varg = [method](const Studentas& s) {
+        double g;
+        if (method == 1) g = galutinis_vidurkis(s);
+        else if (method == 2) g = galutinis_mediana(s);
+        else g = galutinis_vidurkis(s);
+        return g < 5.0;
+        };
+
+    std::copy_if(all.begin(), all.end(), std::back_inserter(varg), is_varg);
+
+    auto it = std::remove_if(all.begin(), all.end(), is_varg);
+    all.erase(it, all.end());
+    kiet = all;
+
+    auto t1 = std::chrono::steady_clock::now();
+    if (out_split_ms) *out_split_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+}
+
+
+template<typename Tag>
 void sort_groups(ContainerT<Tag, Studentas>& varg,
     ContainerT<Tag, Studentas>& kiet,
     int rikiavimas,
