@@ -191,5 +191,36 @@ Is viso: 134431 ms
 Pirmo studento atminties adresas: 00000161D6E6A180
 ---------------------------------------
 
+## Skaidymo strategijos (v1.0)
+
+### Strategija 1 - `partition_copy`
+Naudojami du nauji konteineriai: vienas vargšiukams, kitas kietiakiams.  
+Naudojamas algoritmas `std::partition_copy`, kuris per vieną perėjimą per duomenis sukuria abi grupes.  
+*Privalumai: greitas skaidymas, paprastas realizavimas.  
+*Trūkumai: dvigubas atminties naudojimas.
+
+### Strategija 2 – `remove_if` + `copy_if`
+Vargšiukai nukopijuojami į naują konteinerį, o iš pradinio pašalinami naudojant `std::remove_if`.  
+*Privalumai: mažesnis atminties poreikis, paprasta kontrolė.  
+*Trūkumai: dvigubas perėjimas per duomenis, lėtesnis dideliems failams.
+
+### Strategija 3 - `partition` (in-place)
+Skirstymas vykdomas vietoje, viename konteineryje naudojant `std::partition`.  
+*Privalumai: mažiausias atminties naudojimas, labai greitas.  
+*Trūkumai: gali pakeisti studentų eiliškumą.
+
+---
+
+### Testavimo planas
+Bus atliktas visų trijų strategijų palyginimas, matuojant **skaidymo laiką** (ms) ir **atminties naudojimą** skirtingiems duomenų kiekiams:  
+| Įrašų kiekis | Strategija 1 | Strategija 2 | Strategija 3 |
+|---------------|---------------|---------------|---------------|
+| 1 000         | 
+| 10 000        | 
+| 100 000       | 
+| 1mil          |
+
+*10 mil. kol kas nerasome, del laiko taupymo*
+
 
 
