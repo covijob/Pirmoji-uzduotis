@@ -105,6 +105,34 @@ void split_groups_remove(ContainerT<Tag, Studentas>& all,
     if (out_split_ms) *out_split_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 }
 
+template<typename Tag>
+void split_groups_inplace(ContainerT<Tag, Studentas>& all,
+    ContainerT<Tag, Studentas>& varg,
+    ContainerT<Tag, Studentas>& kiet,
+    int method,
+    long long* out_split_ms) {
+    auto t0 = std::chrono::steady_clock::now();
+
+    varg.clear();
+    kiet.clear();
+
+    auto is_varg = [method](const Studentas& s) {
+        double g;
+        if (method == 1) g = galutinis_vidurkis(s);
+        else if (method == 2) g = galutinis_mediana(s);
+        else g = galutinis_vidurkis(s);
+        return g < 5.0;
+        };
+
+    auto mid = std::partition(all.begin(), all.end(), is_varg);
+
+    varg.insert(varg.end(), all.begin(), mid);
+    kiet.insert(kiet.end(), mid, all.end());
+
+    auto t1 = std::chrono::steady_clock::now();
+    if (out_split_ms) *out_split_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+}
+
 
 template<typename Tag>
 void sort_groups(ContainerT<Tag, Studentas>& varg,
