@@ -118,6 +118,21 @@ int main() {
             std::cout << "Prasome pasirinkti 1 arba 2: ";
         }
 
+        int palyginimas = 0;
+        std::cout << "Ar norite paleisti visus 3 strategiju testus automatiskai? (1 - taip, 0 - ne): ";
+        std::cin >> palyginimas;
+
+        if (palyginimas == 1 && versija == 2) {
+            std::cout << "\nAutomatinis strategiju palyginimo rezimas (v0.3):\n";
+            for (int s = 1; s <= 3; s++) {
+                std::cout << "\nStrategija " << s << ":\n";
+                if (konteineris == 1) run_v03<VectorTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+                else run_v03<ListTag>(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas);
+            }
+            return 0;
+        }
+
+
         if (versija == 1) {
             long long t_read_ms = 0, t_split_ms = 0, t_write_ms = 0;
             split_streaming(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas,

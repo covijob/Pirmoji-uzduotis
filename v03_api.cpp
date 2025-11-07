@@ -116,6 +116,10 @@ void split_groups_inplace(ContainerT<Tag, Studentas>& all,
     varg.clear();
     kiet.clear();
 
+    bool stable = false;
+    std::cout << "Naudoti stable partition (1 - taip, 0 - ne): ";
+    std::cin >> stable;
+
     auto is_varg = [method](const Studentas& s) {
         double g;
         if (method == 1) g = galutinis_vidurkis(s);
@@ -124,7 +128,9 @@ void split_groups_inplace(ContainerT<Tag, Studentas>& all,
         return g < 5.0;
         };
 
-    auto mid = std::partition(all.begin(), all.end(), is_varg);
+    auto mid = stable
+        ? std::stable_partition(all.begin(), all.end(), is_varg)
+        : std::partition(all.begin(), all.end(), is_varg);
 
     varg.insert(varg.end(), all.begin(), mid);
     kiet.insert(kiet.end(), mid, all.end());
@@ -132,6 +138,7 @@ void split_groups_inplace(ContainerT<Tag, Studentas>& all,
     auto t1 = std::chrono::steady_clock::now();
     if (out_split_ms) *out_split_ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 }
+
 
 
 template<typename Tag>
