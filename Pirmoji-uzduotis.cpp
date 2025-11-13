@@ -31,7 +31,7 @@ int main() {
     std::string pr = "studentai1.txt";
 
     int pasirinktas_saltinis = 1;
-    std::cout << "Pasirinkite duomenu saltini (1 - txt failas, 2 - atsitiktinai generuoti duomenys, 3 - rankinis ivedimas): \n";
+    std::cout << "Pasirinkite duomenu saltini (1 - naudoti esama txt faila, 2 - sugeneruoti naujus failus, 3 - rankinis ivedimas): \n";
     std::cout << "__________________________________________________________\n";
     if (!(std::cin >> pasirinktas_saltinis) || (pasirinktas_saltinis < 1 || pasirinktas_saltinis > 3)) {
         std::cout << "Prasome pasirinkti 1, 2 arba 3.\n";
@@ -39,6 +39,51 @@ int main() {
     }
 
     std::vector<std::string> sugeneruoti;
+
+    if (pasirinktas_saltinis == 1) {
+        std::vector<std::string> galimi_failai;
+        std::vector<std::string> rasti_failai;
+
+        std::vector<std::size_t> N_list = { 1000, 10000, 100000, 1000000, 10000000 };
+
+        for (int K : {6, 7}) {
+            for (auto N : N_list) {
+                std::string vardas = "studentai_" + std::to_string(N) + "_K" + std::to_string(K) + ".txt";
+                galimi_failai.push_back(vardas);
+            }
+        }
+
+        for (const auto& fname : galimi_failai) {
+            std::ifstream f(fname);
+            if (f) {
+                rasti_failai.push_back(fname);
+            }
+        }
+
+        if (rasti_failai.empty()) {
+            std::cout << "Nerasta nei vieno studentu failo (studentai_*.txt) dabartiniame kataloge.\n";
+            std::cout << "Pirmiau sugeneruokite failus (pasirinkimas 2).\n";
+            return 0;
+        }
+
+        std::cout << "Rasti failai:\n";
+        for (std::size_t i = 0; i < rasti_failai.size(); ++i) {
+            std::cout << i + 1 << " - " << rasti_failai[i] << "\n";
+        }
+
+        std::cout << "Pasirinkite faila pagal numeri: ";
+        int failo_indeksas = 0;
+        while (!(std::cin >> failo_indeksas) ||
+            failo_indeksas < 1 ||
+            failo_indeksas > static_cast<int>(rasti_failai.size())) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Blogas pasirinkimas. Bandykite dar karta: ";
+        }
+
+        pr = rasti_failai[failo_indeksas - 1];
+        std::cout << ">> Pasirinktas failas: " << pr << "\n";
+    }
 
     if (pasirinktas_saltinis == 2) {
         std::mt19937 rng(std::random_device{}());
@@ -63,20 +108,9 @@ int main() {
         }
 
         std::cout << "Visu " << sugeneruoti.size() << " failu generavimas: " << gen_total_ms << " ms\n";
+        std::cout << ">>> Generavimas baigtas. Siuos failus veliau galesite naudoti pasirinkdami 1 varianta.\n";
 
-        std::cout << "Pasirinkite kuri sugeneruota faila naudoti:\n";
-        for (size_t i = 0; i < sugeneruoti.size(); i++) {
-            std::cout << i + 1 << " - " << sugeneruoti[i] << "\n";
-        }
-        int pasirinktas_failas = 0;
-        while (!(std::cin >> pasirinktas_failas) ||
-            pasirinktas_failas < 1 || pasirinktas_failas >(int)sugeneruoti.size()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Blogas pasirinkimas. Bandykite dar karta: ";
-        }
-        pr = sugeneruoti[pasirinktas_failas - 1];
-        std::cout << ">> Pasirinktas failas: " << pr << "\n";
+        return 0;
     }
 
     int vartotojo_pasirinkimas = 1;
