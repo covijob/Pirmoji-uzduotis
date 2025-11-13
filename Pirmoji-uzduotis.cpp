@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <chrono>
 #include <thread>
+#include <filesystem>  
 
 #include "studentai.hpp"
 #include "skaiciavimas.hpp"
@@ -18,6 +19,8 @@
 #include "generatorius.hpp"
 #include "formatas.hpp"
 #include "streaming.hpp"
+
+namespace fs = std::filesystem;
 
 int main() {
     using clock = std::chrono::steady_clock;
@@ -28,24 +31,72 @@ int main() {
     std::string pr = "studentai1.txt";
 
     int pasirinktas_saltinis = 1;
-    std::cout << "Pasirinkite duomenu saltini (1 - txt failas, 2 - atsitiktinai generuoti duomenys, 3 - rankinis ivedimas): \n";
+
+    std::cout << "Pasirinkite veiksma:\n";
+    std::cout << "  1 - naudoti jau sugeneruotus / esamus studentu failus\n";
+    std::cout << "  2 - sugeneruoti naujus atsitiktinius failus (be tolimesnio apdorojimo)\n";
+    std::cout << "  3 - rankinis ivedimas is klaviaturos\n";
     std::cout << "__________________________________________________________\n";
+
     if (!(std::cin >> pasirinktas_saltinis) || (pasirinktas_saltinis < 1 || pasirinktas_saltinis > 3)) {
         std::cout << "Prasome pasirinkti 1, 2 arba 3.\n";
         return 1;
     }
 
-    std::vector<std::string> sugeneruoti;
+    if (pasirinktas_saltinis == 1) {
+        std::vector<std::string> rasti_failai;
+
+        for (const auto& entry : fs::directory_iterator(fs::current_path())) {
+            if (!entry.is_regular_file()) continue;
+            auto path = entry.path();
+
+            if (path.extension() == ".txt") {
+                std::string fname = path.filename().string();
+
+                if (fname.rfind("studentai_", 0) == 0) {
+                    rasti_failai.push_back(fname);
+                }
+            }
+        }
+
+        if (rasti_failai.empty()) {
+            std::cout << "Nerasta nei vieno failo, prasidedancio 'studentai_' dabartiniame kataloge.\n";
+            std::cout << "Pirmiau sugeneruokite failus (pasirinkimas 2).\n";
+            return 0;
+        }
+
+        std::sort(rasti_failai.begin(), rasti_failai.end());
+
+        std::cout << "Rasti failai:\n";
+        for (std::size_t i = 0; i < rasti_failai.size(); ++i) {
+            std::cout << "  " << (i + 1) << " - " << rasti_failai[i] << "\n";
+        }
+
+        std::cout << "Pasirinkite faila pagal numeri: ";
+        int failo_indeksas = 0;
+        while (!(std::cin >> failo_indeksas) ||
+            failo_indeksas < 1 ||
+            failo_indeksas > static_cast<int>(rasti_failai.size())) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Blogas pasirinkimas. Bandykite dar karta: ";
+        }
+
+        pr = rasti_failai[failo_indeksas - 1];
+        std::cout << ">> Pasirinktas failas: " << pr << "\n";
+    }
 
     if (pasirinktas_saltinis == 2) {
         std::mt19937 rng(std::random_device{}());
         std::uniform_int_distribution<int> distK(6, 7);
         int K = distK(rng);
 
-        std::vector<std::size_t> N_list = { 10000000};
+        std::vector<std::size_t> N_list = { 1000, 10000, 100000, 1000000, 10000000 };
 
         std::cout << "Generavimas (K=" << K << "):\n";
         long long gen_total_ms = 0;
+        std::vector<std::string> sugeneruoti;
+
         for (auto N : N_list) {
             std::string vardas = "studentai_" + std::to_string(N) + "_K" + std::to_string(K) + ".txt";
 
@@ -60,19 +111,8 @@ int main() {
         }
         std::cout << "Visu 5 failu generavimas: " << gen_total_ms << " ms\n";
 
-        std::cout << "Pasirinkite kuri sugeneruota faila naudoti:\n";
-        for (size_t i = 0; i < sugeneruoti.size(); i++) {
-            std::cout << i + 1 << " - " << sugeneruoti[i] << "\n";
-        }
-        int pasirinktas_failas = 0;
-        while (!(std::cin >> pasirinktas_failas) ||
-            pasirinktas_failas < 1 || pasirinktas_failas >(int)sugeneruoti.size()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Blogas pasirinkimas. Bandykite dar kartą: ";
-        }
-        pr = sugeneruoti[pasirinktas_failas - 1];
-        std::cout << ">> Pasirinktas failas: " << pr << "\n";
+        std::cout << ">>> Generavimas baigtas. Siuos failus veliau galesite naudoti pasirinkdami 1 varianta.\n";
+        return 0;
     }
 
     int vartotojo_pasirinkimas = 1;
@@ -95,7 +135,7 @@ int main() {
 
     std::vector<Studentas> grupe;
 
-    if (pasirinktas_saltinis != 3) {
+    if (pasirinktas_saltinis == 1) {
         long long t_read_ms = 0, t_split_ms = 0, t_write_ms = 0;
         split_streaming(pr, vartotojo_pasirinkimas, rikiavimo_pasirinkimas,
             &t_read_ms, &t_split_ms, &t_write_ms);
@@ -128,9 +168,10 @@ int main() {
 
     for (const auto& s : grupe) {
         double galutinis;
-        if (vartotojo_pasirinkimas == 1) galutinis = galutinis_vidurkis(s);
+        if (vartotojo_pasirinkimas == 1)      galutinis = galutinis_vidurkis(s);
         else if (vartotojo_pasirinkimas == 2) galutinis = galutinis_mediana(s);
-        else                                   galutinis = galutinis_vidurkis(s);
+        else                                  galutinis = galutinis_vidurkis(s);
+
         if (galutinis < 5.0) vargsiukai.push_back(s);
         else                 kietiakiai.push_back(s);
     }
